@@ -1,55 +1,56 @@
-# Desafio Node Chat
+# Node Chat Challenge
 
-## Objetivo
-Construir um sistema de servidor e clientes baseado em Web Sockets usando apenas os módulos nativos do Node, que permita troca de mensagens instantâneas com fan-out (ou broadcast), onde clientes conectados em uma mesma "sala" recebem todas as mensagens enviadas por qualquer um deles.
+## Objective
+Build a client/server system based in the Web Sockets Protocol using only Node native modules, that allows instant message exchange with fan-out, where clients connected to the same "room" receive all the messages sent by any of them.
 
-## Regras
-- Não pode ver tutorial passo-a-passo
-- Não pode pedir ajuda pra ninguém, é você e o VSCode e as docs
-- Não pode usar nenhuma biblioteca, **exceto** bibliotecas para testes automatizados, caso queira
-- Liberado para consulta:
-  - Documentação oficial do Node
-  - Stack Overflow
+## Rules
+- You can't follow a step-by-step tutorial
+- You can't use any library (package), **except** libraries for automated tests, if you want to add them
+- You *can* consult:
+  - Node official docs
+  - Stack overflow
+  - Ask for help in specific parts
+  
+## Requirements
+- You should have two javascript files, at least:
+  - server.js (or .mjs)
+  - client.js (or .mjs)
+- You can include more files if you wish to
+- Expected behavior from each file:
+  - server.js, when ran with `node server.js`:
+    - The server will open in any port of your choosing, and begins accepting connections in this port
+    - The connections are always following the Web Socket protocol and must include a "room"
+    - If the room doesn't exist, it must be created
+    - If the room exists, the client is added to the list of clients in that room
+    - Any message received in a room is delivered to all clients connected to the same room
+    - Clients connected to a room don't receive messages from other rooms
+    - The server generates a unique ID for each client, and is capable of sending messages by itself both for individual clients and for the whole room, without necessarily needing a client to send a message
+    - When a client connects to a room, it is necessary to show all the message history in that room to that client, and it's needed to communicate all clients in that room that a new client has connected
+    - Consider that the room will only last while the server is up (which means, you don't have to persist the messages if the server goes down), but the room must remain open even if there is no client connected, since it can receive new connections
+    - All the messages received from any client and every time a client connects is displayed in the server's stdout (probably the terminal)
+  - client.js, when ran with `node client.js <room-name>`, considering the server is up
+    - Connects to the server in the room `<room-name>` and keeps the terminal open
+    - Any message typed in the terminal (through `stdin`) is sent to the server
+    - Any message received from the server is shown in the terminal (`stdout`)
+- You must have a solution so that a client doesn't see the message it just sent twice.
+  - This solution can be server-side, client-side, or both
+  
+## Tips
+- You'll probably want to use `http` module
+- You may want to use the `crypto` module to generate unique IDs
+- It's usually easier to create the server first
+- Keep your code clean and organized, since it will be easier for you to reason about it
 
-## Requisitos
-- É preciso haver dois arquivos javascript, ao menos:
-  - server.js
-  - client.js
-- Você pode incluir mais arquivos caso desejar
-- Comportamento esperado de cada arquivo:
-  - server.js, ao rodar com `node server.js`:
-    - O servidor abre em uma porta qualquer (à sua escolha ao fazer o código, não precisa ser dinâmico), passando a aceitar conexões nessa porta
-    - As conexões são sempre seguindo o protocolo WebSocket, e devem incluir uma "sala"
-    - Caso a sala não exista, deve ser criada
-    - Caso a sala exista, o client é adicionado à lista de clients daquela sala
-    - Qualquer mensagem recebida em uma "sala" é entregue a todos os clients conectados na mesma sala
-    - Clients conectados a uma sala não recebem mensagens de outras salas
-    - O servidor gera um ID único para cada client, e é capaz de enviar mensagens por si só tanto para clients individualmente quanto para toda a sala, sem necessitar necessariamente que um client envie uma mensagem
-    - Quando um client se conectar a uma sala, é preciso mostrar todo o histórico de mensagens já enviadas naquela sala antes da conexão, e é preciso avisar todos os clients da sala que um novo client se conectou
-    - Considere que a sala dura somente enquanto o servidor está de pé (ou seja, pode ficar somente na memória), mas a sala deve permanecer aberta mesmo que não haja nenhum client conectado mais a ela, pois pode receber conexões de novos clients
-    - Todas as mensagens enviadas e sempre que um client se conecta ou desconecta são mostradas no terminal do servidor
-  - client.js, ao rodar com `node client.js nome-da-sala`, considerando que o servidor está aberto
-    - Conecta-se a `nome-da-sala`, e mantém o terminal aberto
-    - Qualquer mensagem digitada no terminal (ou seja, que vem através do `stdin`) é enviada ao servidor
-    - Qualquer mensagem recebida do servidor é mostrada no terminal
-- Espera-se que um client não mostre 2x a mensagem que acabou de enviar, você pode fazer o código que remove essa duplicação tanto no client quanto no server (ou em ambos), à sua escolha
-
-## Dicas
-- Você provavelmente vai usar o módulo `http` do Node
-- Você pode querer usar o módulo `crypto` para gerar IDs únicos
-- Normalmente é mais fácil fazer o servidor primeiro
-- Deixe seu código organizado, com funções de escopo bem definido, sempre que terminar alguma "parte" (como abrir o servidor)
-
-## Requisitos bônus
-(fique à vontade para fazer quaisquer desses que quiser)
-(PS: qualquer um desses só importa se todos os requisitos mínimos estiverem cumpridos)
-- Testes
-- O servidor persiste o histórico de mensagens mesmo quando é desligado
-  - Pode ser no disco local (usando o módulo `fs` por exemplo)
-    - Requisito bônus do bônus: as mensagens são gravadas em um arquivo de log "append-only" em modo "stream"
-      - Ou seja, quando uma sala é aberta, o servidor abre uma conexão de append para um arquivo com o nome da sala, e
-      - Adiciona as mensagens ao final do arquivo conforme chegam, e
-      - Quando algum client novo se conecta, o servidor lê todas as mensagens (linhas) desse arquivo e envia para o client, sem manter as mensagens em memória
-  - Caso queira persistir em um banco de dados, pode instalar uma biblioteca de driver desse banco que for usar
-- Os clients podem escolher um nickname
-- O client que abrir uma sala nova pode definir uma senha, e quaisquer novos clients devem informar a senha para entrar
+## Bonus requirements
+(not in any particular order)
+(PS: any of those only really count if all the basic requirements are already finished)
+- Automated tests
+- The server persists the history even when it is shut down
+  - If you want to persist in a DB, feel free to install that DB's module
+  - Or you can persist in local disk, using `fs` module
+    - Bonus bonus requirement
+      - The messages are stored in an "append-only" log, open in stream mode when the server is up
+      - When a message comes in, it is appended to the log specific to that room
+      - Whenever a client logs in, the server reads the full history and sends it to the client by streaming (not keeping the buffer in memory)
+- Clients can choose a nickname
+- The client that opens a new room can define a password, and any new clients that connect must inform that password to connect
